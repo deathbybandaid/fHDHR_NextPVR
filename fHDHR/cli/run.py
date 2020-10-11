@@ -4,7 +4,10 @@ import time
 import argparse
 from multiprocessing import Process
 
-from fHDHR import fHDHR_VERSION, config, originservice, ssdpserver, epghandler, fHDHRerrors, fHDHRweb
+from fHDHR import (fHDHR_VERSION, config, originservice,
+                   ssdpserver, epghandler, fHDHRerrors,
+                   fHDHRweb)
+from fHDHR.db import fHDHRdb
 
 ERR_CODE = 1
 ERR_CODE_NO_RESTART = 2
@@ -31,6 +34,11 @@ def get_configuration(args, script_dir):
 
 def get_originservice(settings):
     return originservice.OriginService(settings)
+
+
+def get_db():
+    db = fHDHRdb()
+    return db
 
 
 def run(settings, origserv, epghandling):
