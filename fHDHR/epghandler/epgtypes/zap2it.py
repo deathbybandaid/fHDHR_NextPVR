@@ -155,7 +155,13 @@ class ZapEPG():
             return result
 
     def remove_stale_cache(self, zap_time):
-        cache_list = self.db.get_cacheitem_value("cache_list", "offline_cache", "zap2it") or []
+        cache_list = self.db.get_cacheitem_value("cache_list", "offline_cache", "zap2it") or ["1602439200"]
+        for cacheitem in cache_list:
+            t = int(cacheitem)
+            if t >= zap_time:
+                continue
+            else:
+                print('Removing stale cache:', str(cacheitem))
         print(cache_list)
         for p in self.web_cache_dir.glob('*'):
             try:
