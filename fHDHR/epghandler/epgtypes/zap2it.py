@@ -140,6 +140,10 @@ class ZapEPG():
         return xmltime
 
     def get_cached(self, cache_key, delay, url):
+        cacheitem = self.db.get_cacheitem_value(cache_key, "offline_cache", "zap2it")
+        if cacheitem:
+            print('FROM CACHE:', str(cacheitem))
+
         cache_path = self.web_cache_dir.joinpath(cache_key)
         if cache_path.is_file():
             print('FROM CACHE:', str(cache_path))
@@ -151,6 +155,9 @@ class ZapEPG():
             result = resp.content
             with open(cache_path, 'wb') as f:
                 f.write(result)
+
+            self.db.set_cacheitem_value(cache_key, "offline_cache", result, "zap2it")
+
             time.sleep(int(delay))
             return result
 
