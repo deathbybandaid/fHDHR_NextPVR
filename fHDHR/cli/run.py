@@ -32,8 +32,8 @@ def get_configuration(args, script_dir):
     return config.Config(args.cfg, script_dir)
 
 
-def get_originservice(settings):
-    return originservice.OriginService(settings)
+def get_originservice(settings, db):
+    return originservice.OriginService(settings, db)
 
 
 def get_db(settings):
