@@ -86,7 +86,8 @@ class ZapEPG():
                     self.db.set_channel_value(
                                               programguide[str(cdict['channelNo'])]["id"],
                                               "thumbnail",
-                                              programguide[str(cdict['channelNo'])]["thumbnail"])
+                                              programguide[str(cdict['channelNo'])]["thumbnail"],
+                                              "zap2it")
 
                 for event in c['events']:
 
@@ -110,6 +111,12 @@ class ZapEPG():
                                     "isnew": False,
                                     "id": str(progdict['id'] or self.xmltimestamp_zap(eventdict['startTime'])),
                                     }
+
+                    self.db.set_program_value(
+                                              clean_prog_dict["id"],
+                                              "thumbnail",
+                                              clean_prog_dict["thumbnail"],
+                                              "zap2it")
 
                     for f in eventdict['filter']:
                         clean_prog_dict["genres"].append(f.replace('filter-', ''))

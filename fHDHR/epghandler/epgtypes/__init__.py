@@ -32,7 +32,7 @@ class EPGTypes():
 
     def get_thumbnail(self, itemtype, itemid):
         if itemtype == "channel":
-            print(self.db.get_channel_value(itemid, "thumbnail"))
+            print(self.db.get_channel_value(itemid, "thumbnail", self.epg_method))
             chandict = self.find_channel_dict(itemid)
             return chandict["thumbnail"]
         elif itemtype == "content":
