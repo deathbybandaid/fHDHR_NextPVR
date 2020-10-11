@@ -269,7 +269,7 @@ class fHDHRdb(object):
 
     # Cache Values
 
-    def set_cache_value(self, cacheitem, key, value, namespace='default'):
+    def set_cacheitem_value(self, cacheitem, key, value, namespace='default'):
         cacheitem = cacheitem.lower()
         value = json.dumps(value, ensure_ascii=False)
         session = self.ssession()
