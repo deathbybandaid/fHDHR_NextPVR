@@ -9,8 +9,9 @@ class HDHR_Hub():
     def __init__(self):
         pass
 
-    def hubprep(self, settings, origserv, epghandling):
+    def hubprep(self, settings, origserv, epghandling, db):
         self.config = settings
+        self.db = db
 
         self.devicexml = fHDHRdevice.Device_XML(settings)
         self.discoverjson = fHDHRdevice.Discover_JSON(settings)
@@ -203,8 +204,9 @@ class HDHR_HTTP_Server():
             currenthtmlerror = hdhr.get_html_error("501 - not a valid command")
             return Response(status=200, response=currenthtmlerror, mimetype='text/html')
 
-    def __init__(self, settings):
+    def __init__(self, settings, db):
         self.config = settings
+        self.db = db
 
     def run(self):
         self.http = WSGIServer((
@@ -217,8 +219,8 @@ class HDHR_HTTP_Server():
             self.http.stop()
 
 
-def interface_start(settings, origserv, epghandling):
+def interface_start(settings, origserv, epghandling, db):
     print("Starting fHDHR Web Interface")
-    hdhr.hubprep(settings, origserv, epghandling)
-    fakhdhrserver = HDHR_HTTP_Server(settings)
+    hdhr.hubprep(settings, origserv, epghandling, db)
+    fakhdhrserver = HDHR_HTTP_Server(settings, db)
     fakhdhrserver.run()

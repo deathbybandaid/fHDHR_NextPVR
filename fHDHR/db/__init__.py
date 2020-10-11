@@ -1,7 +1,5 @@
 # coding=utf-8
-from __future__ import absolute_import, division, print_function, unicode_literals
 
-import errno
 import json
 import os.path
 import traceback
@@ -34,64 +32,60 @@ MYSQL_TABLE_ARGS = {'mysql_engine': 'InnoDB',
                     'mysql_collate': 'utf8mb4_unicode_ci'}
 
 
-class PluginValues(BASE):
-    __tablename__ = 'plugin_values'
+class ChannelValues(BASE):
+    __tablename__ = 'channel_values'
     __table_args__ = MYSQL_TABLE_ARGS
-    plugin = Column(String(255), primary_key=True)
-    namespace = Column(String(255), primary_key=True)
+    channel = Column(String(255), primary_key=True)
+    key = Column(String(255), primary_key=True)
+    value = Column(Text())
+
+
+class ProgramValues(BASE):
+    __tablename__ = 'program_values'
+    __table_args__ = MYSQL_TABLE_ARGS
+    channel = Column(String(255), primary_key=True)
     key = Column(String(255), primary_key=True)
     value = Column(Text())
 
 
 class fHDHRdb(object):
 
-    def __init__(self, config):
+    def __init__(self, settings):
+        self.config = settings
         # MySQL - mysql://username:password@localhost/db
         # SQLite - sqlite:////cache/path/default.db
-        self.type = config.core.db_type
+        self.type = self.config.dict["database"]["type"]
 
         # Handle SQLite explicitly as a default
         if self.type == 'sqlite':
-            path = config.core.db_filename
-            if path is None:
-                path = os.path.join(config.core.homedir, config.basename + '.db')
+            path = self.config.dict["filedir"]["sqlite_db"]
             path = os.path.expanduser(path)
-            if not os.path.isabs(path):
-                path = os.path.normpath(os.path.join(config.core.homedir, path))
-            if not os.path.isdir(os.path.dirname(path)):
-                raise OSError(
-                    errno.ENOENT,
-                    'Cannot create database file. '
-                    'No such directory: "{}". Check that configuration setting '
-                    'core.db_filename is valid'.format(os.path.dirname(path)),
-                    path
-                )
             self.filename = path
             self.url = 'sqlite:///%s' % path
         # Otherwise, handle all other database engines
         else:
             query = {}
             if self.type == 'mysql':
-                drivername = config.core.db_driver or 'mysql'
+                drivername = self.config.dict["database"]["driver"] or 'mysql'
                 query = {'charset': 'utf8mb4'}
             elif self.type == 'postgres':
-                drivername = config.core.db_driver or 'postgresql'
+                drivername = self.config.dict["database"]["driver"] or 'postgresql'
             elif self.type == 'oracle':
-                drivername = config.core.db_driver or 'oracle'
+                drivername = self.config.dict["database"]["driver"] or 'oracle'
             elif self.type == 'mssql':
-                drivername = config.core.db_driver or 'mssql+pymssql'
+                drivername = self.config.dict["database"]["driver"] or 'mssql+pymssql'
             elif self.type == 'firebird':
-                drivername = config.core.db_driver or 'firebird+fdb'
+                drivername = self.config.dict["database"]["driver"] or 'firebird+fdb'
             elif self.type == 'sybase':
-                drivername = config.core.db_driver or 'sybase+pysybase'
+                drivername = self.config.dict["database"]["driver"] or 'sybase+pysybase'
             else:
                 raise Exception('Unknown db_type')
 
-            db_user = config.core.db_user
-            db_pass = config.core.db_pass
-            db_host = config.core.db_host
-            db_port = config.core.db_port  # Optional
-            db_name = config.core.db_name  # Optional, depending on DB
+            db_user = self.config.dict["database"]["user"]
+            db_pass = self.config.dict["database"]["pass"]
+            db_host = self.config.dict["database"]["host"]
+            db_port = self.config.dict["database"]["prt"]  # Optional
+            db_name = self.config.dict["database"]["name"]  # Optional, depending on DB
 
             # Ensure we have all our variables defined
             if db_user is None or db_pass is None or db_host is None:
@@ -134,24 +128,25 @@ class fHDHRdb(object):
     def get_uri(self):
         return self.url
 
-    def set_plugin_value(self, plugin, key, value, namespace='default'):
-        plugin = plugin.lower()
+    # Channel Values
+
+    def set_channel_value(self, channel, key, value):
+        channel = channel.lower()
         value = json.dumps(value, ensure_ascii=False)
         session = self.ssession()
         try:
-            result = session.query(PluginValues) \
-                .filter(PluginValues.plugin == plugin)\
-                .filter(PluginValues.namespace == namespace)\
-                .filter(PluginValues.key == key) \
+            result = session.query(ChannelValues) \
+                .filter(ChannelValues.channel == channel)\
+                .filter(ChannelValues.key == key) \
                 .one_or_none()
-            # PluginValues exists, update
+            # ChannelValues exists, update
             if result:
                 result.value = value
                 session.commit()
             # DNE - Insert
             else:
-                new_pluginvalue = PluginValues(plugin=plugin, namespace=namespace, key=key, value=value)
-                session.add(new_pluginvalue)
+                new_channelvalue = ChannelValues(channel=channel, key=key, value=value)
+                session.add(new_channelvalue)
                 session.commit()
         except SQLAlchemyError:
             session.rollback()
@@ -159,14 +154,13 @@ class fHDHRdb(object):
         finally:
             session.close()
 
-    def get_plugin_value(self, plugin, key, namespace='default'):
-        plugin = plugin.lower()
+    def get_channel_value(self, channel, key):
+        channel = channel.lower()
         session = self.ssession()
         try:
-            result = session.query(PluginValues) \
-                .filter(PluginValues.plugin == plugin)\
-                .filter(PluginValues.namespace == namespace)\
-                .filter(PluginValues.key == key) \
+            result = session.query(ChannelValues) \
+                .filter(ChannelValues.channel == channel)\
+                .filter(ChannelValues.key == key) \
                 .one_or_none()
             if result is not None:
                 result = result.value
@@ -177,16 +171,15 @@ class fHDHRdb(object):
         finally:
             session.close()
 
-    def delete_plugin_value(self, plugin, key, namespace='default'):
-        plugin = plugin.lower()
+    def delete_channel_value(self, channel, key):
+        channel = channel.lower()
         session = self.ssession()
         try:
-            result = session.query(PluginValues) \
-                .filter(PluginValues.plugin == plugin)\
-                .filter(PluginValues.namespace == namespace)\
-                .filter(PluginValues.key == key) \
+            result = session.query(ChannelValues) \
+                .filter(ChannelValues.channel == channel)\
+                .filter(ChannelValues.key == key) \
                 .one_or_none()
-            # PluginValues exists, delete
+            # ChannelValues exists, delete
             if result:
                 session.delete(result)
                 session.commit()
@@ -196,24 +189,25 @@ class fHDHRdb(object):
         finally:
             session.close()
 
-    def adjust_plugin_value(self, plugin, key, value, namespace='default'):
-        plugin = plugin.lower()
+    # Program Values
+
+    def set_program_value(self, program, key, value):
+        program = program.lower()
         value = json.dumps(value, ensure_ascii=False)
         session = self.ssession()
         try:
-            result = session.query(PluginValues) \
-                .filter(PluginValues.plugin == plugin)\
-                .filter(PluginValues.namespace == namespace)\
-                .filter(PluginValues.key == key) \
+            result = session.query(ProgramValues) \
+                .filter(ProgramValues.program == program)\
+                .filter(ProgramValues.key == key) \
                 .one_or_none()
-            # PluginValue exists, update
+            # ProgramValue exists, update
             if result:
-                result.value = float(result.value) + float(value)
+                result.value = value
                 session.commit()
             # DNE - Insert
             else:
-                new_pluginvalue = PluginValues(plugin=plugin, namespace=namespace, key=key, value=float(value))
-                session.add(new_pluginvalue)
+                new_programvalue = ProgramValues(program=program, key=key, value=value)
+                session.add(new_programvalue)
                 session.commit()
         except SQLAlchemyError:
             session.rollback()
@@ -221,42 +215,34 @@ class fHDHRdb(object):
         finally:
             session.close()
 
-    def adjust_plugin_list(self, plugin, key, entries, adjustmentdirection, namespace='default'):
-        plugin = plugin.lower()
-        if not isinstance(entries, list):
-            entries = [entries]
-        entries = json.dumps(entries, ensure_ascii=False)
+    def get_program_value(self, program, key):
+        program = program.lower()
         session = self.ssession()
         try:
-            result = session.query(PluginValues) \
-                .filter(PluginValues.plugin == plugin)\
-                .filter(PluginValues.namespace == namespace)\
-                .filter(PluginValues.key == key) \
+            result = session.query(ProgramValues) \
+                .filter(ProgramValues.program == program)\
+                .filter(ProgramValues.key == key) \
                 .one_or_none()
-            # PluginValue exists, update
+            if result is not None:
+                result = result.value
+            return _deserialize(result)
+        except SQLAlchemyError:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
+    def delete_program_value(self, program, key):
+        program = program.lower()
+        session = self.ssession()
+        try:
+            result = session.query(ProgramValues) \
+                .filter(ProgramValues.program == program)\
+                .filter(ProgramValues.key == key) \
+                .one_or_none()
+            # ProgramValue exists, delete
             if result:
-                if adjustmentdirection == 'add':
-                    for entry in entries:
-                        if entry not in result.value:
-                            result.value.append(entry)
-                elif adjustmentdirection == 'del':
-                    for entry in entries:
-                        while entry in result.value:
-                            result.value.remove(entry)
-                session.commit()
-            # DNE - Insert
-            else:
-                values = []
-                if adjustmentdirection == 'add':
-                    for entry in entries:
-                        if entry not in values:
-                            values.append(entry)
-                elif adjustmentdirection == 'del':
-                    for entry in entries:
-                        while entry in values:
-                            values.remove(entry)
-                new_pluginvalue = PluginValues(plugin=plugin, namespace=namespace, key=key, value=values)
-                session.add(new_pluginvalue)
+                session.delete(result)
                 session.commit()
         except SQLAlchemyError:
             session.rollback()

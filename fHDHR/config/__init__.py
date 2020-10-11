@@ -34,6 +34,7 @@ class Config():
         self.dict["filedir"] = {
                                     "script_dir": script_dir,
                                     "data_dir": data_dir,
+                                    "sqlite_db": pathlib.Path(data_dir).joinpath('fhdhr.db'),
 
                                     "cache_dir": pathlib.Path(data_dir).joinpath('cache'),
                                     "internal_config": pathlib.Path(data_dir).joinpath('internal_config'),

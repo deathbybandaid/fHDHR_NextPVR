@@ -5,8 +5,9 @@ from . import epgtypes
 
 class EPGhandler():
 
-    def __init__(self, settings, origserv):
+    def __init__(self, settings, origserv, db):
         self.config = settings
+        self.db = db
 
         self.epg_method = self.config.dict["fhdhr"]["epg_method"]
         if self.epg_method:

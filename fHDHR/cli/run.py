@@ -36,12 +36,12 @@ def get_originservice(settings):
     return originservice.OriginService(settings)
 
 
-def get_db():
-    db = fHDHRdb()
+def get_db(settings):
+    db = fHDHRdb(settings)
     return db
 
 
-def run(settings, origserv, epghandling):
+def run(settings, origserv, epghandling, db):
 
     if settings.dict["fhdhr"]["discovery_address"]:
         ssdpServer = Process(target=ssdpserver.ssdpServerProcess, args=(settings,))
@@ -51,7 +51,7 @@ def run(settings, origserv, epghandling):
         epgServer = Process(target=epghandler.epgServerProcess, args=(settings, epghandling))
         epgServer.start()
 
-    fhdhrweb = Process(target=fHDHRweb.interface_start, args=(settings, origserv, epghandling))
+    fhdhrweb = Process(target=fHDHRweb.interface_start, args=(settings, origserv, epghandling, db))
     fhdhrweb.start()
 
     print(settings.dict["fhdhr"]["friendlyname"] + " is now running!")
@@ -72,19 +72,21 @@ def start(args, script_dir):
         print(e)
         return ERR_CODE_NO_RESTART
 
+    db = get_db(settings)
+
     try:
-        origserv = get_originservice(settings)
+        origserv = get_originservice(settings, db)
     except fHDHRerrors.LoginError as e:
         print(e)
         return ERR_CODE_NO_RESTART
 
     try:
-        epghandling = epghandler.EPGhandler(settings, origserv)
+        epghandling = epghandler.EPGhandler(settings, origserv, db)
     except fHDHRerrors.EPGSetupError as e:
         print(e)
         return ERR_CODE_NO_RESTART
 
-    return run(settings, origserv, epghandling)
+    return run(settings, origserv, epghandling, db)
 
 
 def main(script_dir):

@@ -7,8 +7,9 @@ from fHDHR.fHDHRerrors import LoginError
 
 class OriginService():
 
-    def __init__(self, settings):
+    def __init__(self, settings, db):
         self.config = settings
+        self.db = db
         self.serviceorigin = serviceorigin.fHDHRservice(settings)
         if not self.serviceorigin.login():
             raise LoginError(self.config.dict["main"]["servicename"] + " Login Failed.")
