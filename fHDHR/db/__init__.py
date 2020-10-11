@@ -50,6 +50,15 @@ class ProgramValues(BASE):
     value = Column(Text())
 
 
+class CacheValues(BASE):
+    __tablename__ = 'cache_values'
+    __table_args__ = MYSQL_TABLE_ARGS
+    cacheitem = Column(String(255), primary_key=True)
+    namespace = Column(String(255), primary_key=True)
+    key = Column(String(255), primary_key=True)
+    value = Column(Text())
+
+
 class fHDHRdb(object):
 
     def __init__(self, settings):
@@ -247,6 +256,70 @@ class fHDHRdb(object):
                 .filter(ProgramValues.program == program)\
                 .filter(ProgramValues.namespace == namespace)\
                 .filter(ProgramValues.key == key) \
+                .one_or_none()
+            # ProgramValue exists, delete
+            if result:
+                session.delete(result)
+                session.commit()
+        except SQLAlchemyError:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
+    # Cache Values
+
+    def set_cache_value(self, cacheitem, key, value, namespace='default'):
+        cacheitem = cacheitem.lower()
+        value = json.dumps(value, ensure_ascii=False)
+        session = self.ssession()
+        try:
+            result = session.query(CacheValues) \
+                .filter(CacheValues.cacheitem == cacheitem)\
+                .filter(CacheValues.namespace == namespace)\
+                .filter(CacheValues.key == key) \
+                .one_or_none()
+            # ProgramValue exists, update
+            if result:
+                result.value = value
+                session.commit()
+            # DNE - Insert
+            else:
+                new_cacheitemvalue = CacheValues(cacheitem=cacheitem, namespace=namespace, key=key, value=value)
+                session.add(new_cacheitemvalue)
+                session.commit()
+        except SQLAlchemyError:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
+    def get_cacheitem_value(self, cacheitem, key, namespace='default'):
+        cacheitem = cacheitem.lower()
+        session = self.ssession()
+        try:
+            result = session.query(CacheValues) \
+                .filter(CacheValues.cacheitem == cacheitem)\
+                .filter(CacheValues.namespace == namespace)\
+                .filter(CacheValues.key == key) \
+                .one_or_none()
+            if result is not None:
+                result = result.value
+            return _deserialize(result)
+        except SQLAlchemyError:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
+    def delete_cacheitem_value(self, cacheitem, key, namespace='default'):
+        cacheitem = cacheitem.lower()
+        session = self.ssession()
+        try:
+            result = session.query(CacheValues) \
+                .filter(CacheValues.cacheitem == cacheitem)\
+                .filter(CacheValues.namespace == namespace)\
+                .filter(CacheValues.key == key) \
                 .one_or_none()
             # ProgramValue exists, delete
             if result:
