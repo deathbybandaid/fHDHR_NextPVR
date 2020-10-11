@@ -36,6 +36,7 @@ class EPGTypes():
             chandict = self.find_channel_dict(itemid)
             return chandict["thumbnail"]
         elif itemtype == "content":
+            print(self.db.get_program_value(itemid, "thumbnail", self.epg_method))
             progdict = self.find_program_dict(itemid)
             return progdict["thumbnail"]
         return None
