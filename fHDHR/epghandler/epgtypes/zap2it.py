@@ -143,18 +143,11 @@ class ZapEPG():
         cacheitem = self.db.get_cacheitem_value(cache_key, "offline_cache", "zap2it")
         if cacheitem:
             print('FROM CACHE:', str(cacheitem))
-
-        cache_path = self.web_cache_dir.joinpath(cache_key)
-        if cache_path.is_file():
-            print('FROM CACHE:', str(cache_path))
-            with open(cache_path, 'rb') as f:
-                return f.read()
+            return cacheitem
         else:
             print('Fetching:  ', url)
             resp = self.web.session.get(url)
             result = resp.content
-            with open(cache_path, 'wb') as f:
-                f.write(result)
 
             self.db.set_cacheitem_value(cache_key, "offline_cache", result, "zap2it")
             cache_list = self.db.get_cacheitem_value("cache_list", "offline_cache", "zap2it") or []
@@ -174,14 +167,3 @@ class ZapEPG():
                 self.db.delete_cacheitem_value(cacheitem, "offline_cache", "zap2it")
                 print('Removing stale cache:', str(cacheitem))
         self.db.set_cacheitem_value("cache_list", "offline_cache", [x for x in cache_list if x not in cache_to_kill], "zap2it")
-
-        for p in self.web_cache_dir.glob('*'):
-            try:
-                t = int(p.name)
-                if t >= zap_time:
-                    continue
-            except Exception as e:
-                print(e)
-                pass
-            print('Removing stale cache file:', p.name)
-            p.unlink()
