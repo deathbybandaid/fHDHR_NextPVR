@@ -157,7 +157,9 @@ class ZapEPG():
                 f.write(result)
 
             self.db.set_cacheitem_value(cache_key, "offline_cache", result, "zap2it")
-            self.db.adjust_cacheitem_list("cache_list", "offline_cache", [cache_key], "add", "zap2it")
+            cache_list = self.db.get_cacheitem_value("cache_list", "offline_cache", "zap2it") or []
+            cache_list.append(cache_key)
+            self.db.set_cacheitem_value("cache_list", "offline_cache", cache_list, "zap2it")
 
             time.sleep(int(delay))
             return result
@@ -171,7 +173,7 @@ class ZapEPG():
                 cache_to_kill.append(cacheitem)
                 self.db.delete_cacheitem_value(cacheitem, "offline_cache", "zap2it")
                 print('Removing stale cache:', str(cacheitem))
-        self.db.adjust_cacheitem_list("cache_list", "offline_cache", cache_to_kill, "del", "zap2it")
+        self.db.set_cacheitem_value("cache_list", "offline_cache", [x for x in cache_list if x not in cache_to_kill], "zap2it")
 
         for p in self.web_cache_dir.glob('*'):
             try:
