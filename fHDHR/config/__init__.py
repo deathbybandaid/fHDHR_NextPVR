@@ -34,7 +34,6 @@ class Config():
         self.dict["filedir"] = {
                                     "script_dir": script_dir,
                                     "data_dir": data_dir,
-                                    "sqlite_db": pathlib.Path(data_dir).joinpath('fhdhr.db'),
 
                                     "cache_dir": pathlib.Path(data_dir).joinpath('cache'),
                                     "internal_config": pathlib.Path(data_dir).joinpath('internal_config'),
@@ -134,6 +133,8 @@ class Config():
             self.dict["filedir"]["cache_dir"] = pathlib.Path(self.dict["main"]["cache_dir"])
         print("Cache set to " + str(self.dict["filedir"]["cache_dir"]))
         cache_dir = self.dict["filedir"]["cache_dir"]
+
+        self.dict["database"]["path"] = pathlib.Path(cache_dir).joinpath('fhdhr.db')
 
         for epg_method in self.dict["main"]["valid_epg_methods"]:
             if epg_method and epg_method != "None":

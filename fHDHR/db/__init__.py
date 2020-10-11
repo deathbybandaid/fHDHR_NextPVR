@@ -58,7 +58,7 @@ class fHDHRdb(object):
 
         # Handle SQLite explicitly as a default
         if self.type == 'sqlite':
-            path = self.config.dict["filedir"]["sqlite_db"]
+            path = self.dict["database"]["path"]
             path = os.path.expanduser(path)
             self.filename = path
             self.url = 'sqlite:///%s' % path
