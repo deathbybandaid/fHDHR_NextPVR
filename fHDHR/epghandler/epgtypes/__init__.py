@@ -7,12 +7,13 @@ from . import blocks, zap2it
 
 class EPGTypes():
 
-    def __init__(self, settings, origserv):
+    def __init__(self, settings, origserv, db):
         self.config = settings
+        self.db = db
         self.origin = origserv
 
-        self.blocks = blocks.BlocksEPG(settings, origserv)
-        self.zap2it = zap2it.ZapEPG(settings, origserv)
+        self.blocks = blocks.BlocksEPG(settings, origserv, db)
+        self.zap2it = zap2it.ZapEPG(settings, origserv, db)
 
         self.epg_method = self.config.dict["fhdhr"]["epg_method"]
         if self.epg_method:
@@ -31,6 +32,7 @@ class EPGTypes():
 
     def get_thumbnail(self, itemtype, itemid):
         if itemtype == "channel":
+            print(self.db.get_channel_value(itemid, "thumbnail"))
             chandict = self.find_channel_dict(itemid)
             return chandict["thumbnail"]
         elif itemtype == "content":

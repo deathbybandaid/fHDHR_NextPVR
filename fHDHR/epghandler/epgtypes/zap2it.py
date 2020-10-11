@@ -9,8 +9,9 @@ from fHDHR.fHDHRerrors import EPGSetupError
 
 class ZapEPG():
 
-    def __init__(self, settings, origserv):
+    def __init__(self, settings, origserv, db):
         self.config = settings
+        self.db = db
         self.origserv = origserv
         self.web = WebReq()
 
@@ -82,6 +83,10 @@ class ZapEPG():
                                                         "thumbnail": str(cdict['thumbnail']).replace("//", "https://").split("?")[0],
                                                         "listing": [],
                                                         }
+                    self.db.set_channel_value(
+                                              programguide[str(cdict['channelNo'])]["id"],
+                                              "thumbnail",
+                                              programguide[str(cdict['channelNo'])]["thumbnail"])
 
                 for event in c['events']:
 

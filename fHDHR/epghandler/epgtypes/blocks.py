@@ -3,8 +3,9 @@ import datetime
 
 class BlocksEPG():
 
-    def __init__(self, settings, origserv):
+    def __init__(self, settings, origserv, db):
         self.config = settings
+        self.db = db
         self.origserv = origserv
 
     def update_epg(self):

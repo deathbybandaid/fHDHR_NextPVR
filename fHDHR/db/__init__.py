@@ -36,6 +36,7 @@ class ChannelValues(BASE):
     __tablename__ = 'channel_values'
     __table_args__ = MYSQL_TABLE_ARGS
     channel = Column(String(255), primary_key=True)
+    namespace = Column(String(255), primary_key=True)
     key = Column(String(255), primary_key=True)
     value = Column(Text())
 
@@ -43,7 +44,8 @@ class ChannelValues(BASE):
 class ProgramValues(BASE):
     __tablename__ = 'program_values'
     __table_args__ = MYSQL_TABLE_ARGS
-    channel = Column(String(255), primary_key=True)
+    program = Column(String(255), primary_key=True)
+    namespace = Column(String(255), primary_key=True)
     key = Column(String(255), primary_key=True)
     value = Column(Text())
 
@@ -130,13 +132,14 @@ class fHDHRdb(object):
 
     # Channel Values
 
-    def set_channel_value(self, channel, key, value):
+    def set_channel_value(self, channel, key, value, namespace='default'):
         channel = channel.lower()
         value = json.dumps(value, ensure_ascii=False)
         session = self.ssession()
         try:
             result = session.query(ChannelValues) \
                 .filter(ChannelValues.channel == channel)\
+                .filter(ChannelValues.namespace == namespace)\
                 .filter(ChannelValues.key == key) \
                 .one_or_none()
             # ChannelValues exists, update
@@ -145,7 +148,7 @@ class fHDHRdb(object):
                 session.commit()
             # DNE - Insert
             else:
-                new_channelvalue = ChannelValues(channel=channel, key=key, value=value)
+                new_channelvalue = ChannelValues(channel=channel, namespace=namespace, key=key, value=value)
                 session.add(new_channelvalue)
                 session.commit()
         except SQLAlchemyError:
@@ -154,12 +157,13 @@ class fHDHRdb(object):
         finally:
             session.close()
 
-    def get_channel_value(self, channel, key):
+    def get_channel_value(self, channel, key, namespace='default'):
         channel = channel.lower()
         session = self.ssession()
         try:
             result = session.query(ChannelValues) \
                 .filter(ChannelValues.channel == channel)\
+                .filter(ChannelValues.namespace == namespace)\
                 .filter(ChannelValues.key == key) \
                 .one_or_none()
             if result is not None:
@@ -171,12 +175,13 @@ class fHDHRdb(object):
         finally:
             session.close()
 
-    def delete_channel_value(self, channel, key):
+    def delete_channel_value(self, channel, key, namespace='default'):
         channel = channel.lower()
         session = self.ssession()
         try:
             result = session.query(ChannelValues) \
                 .filter(ChannelValues.channel == channel)\
+                .filter(ChannelValues.namespace == namespace)\
                 .filter(ChannelValues.key == key) \
                 .one_or_none()
             # ChannelValues exists, delete
@@ -191,13 +196,14 @@ class fHDHRdb(object):
 
     # Program Values
 
-    def set_program_value(self, program, key, value):
+    def set_program_value(self, program, key, value, namespace='default'):
         program = program.lower()
         value = json.dumps(value, ensure_ascii=False)
         session = self.ssession()
         try:
             result = session.query(ProgramValues) \
                 .filter(ProgramValues.program == program)\
+                .filter(ProgramValues.namespace == namespace)\
                 .filter(ProgramValues.key == key) \
                 .one_or_none()
             # ProgramValue exists, update
@@ -206,7 +212,7 @@ class fHDHRdb(object):
                 session.commit()
             # DNE - Insert
             else:
-                new_programvalue = ProgramValues(program=program, key=key, value=value)
+                new_programvalue = ProgramValues(program=program, namespace=namespace, key=key, value=value)
                 session.add(new_programvalue)
                 session.commit()
         except SQLAlchemyError:
@@ -215,12 +221,13 @@ class fHDHRdb(object):
         finally:
             session.close()
 
-    def get_program_value(self, program, key):
+    def get_program_value(self, program, key, namespace='default'):
         program = program.lower()
         session = self.ssession()
         try:
             result = session.query(ProgramValues) \
                 .filter(ProgramValues.program == program)\
+                .filter(ProgramValues.namespace == namespace)\
                 .filter(ProgramValues.key == key) \
                 .one_or_none()
             if result is not None:
@@ -232,12 +239,13 @@ class fHDHRdb(object):
         finally:
             session.close()
 
-    def delete_program_value(self, program, key):
+    def delete_program_value(self, program, key, namespace='default'):
         program = program.lower()
         session = self.ssession()
         try:
             result = session.query(ProgramValues) \
                 .filter(ProgramValues.program == program)\
+                .filter(ProgramValues.namespace == namespace)\
                 .filter(ProgramValues.key == key) \
                 .one_or_none()
             # ProgramValue exists, delete

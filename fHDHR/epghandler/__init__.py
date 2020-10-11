@@ -13,7 +13,7 @@ class EPGhandler():
         if self.epg_method:
             self.sleeptime = self.config.dict[self.epg_method]["epg_update_frequency"]
 
-        self.epgtypes = epgtypes.EPGTypes(settings, origserv)
+        self.epgtypes = epgtypes.EPGTypes(settings, origserv, db)
 
     def get_thumbnail(self, itemtype, itemid):
         return self.epgtypes.get_thumbnail(itemtype, itemid)
