@@ -32,15 +32,6 @@ def get_configuration(args, script_dir):
     return config.Config(args.cfg, script_dir)
 
 
-def get_originservice(settings, db):
-    return originservice.OriginService(settings, db)
-
-
-def get_db(settings):
-    db = fHDHRdb(settings)
-    return db
-
-
 def run(settings, origserv, epghandling, db):
 
     if settings.dict["fhdhr"]["discovery_address"]:
@@ -72,10 +63,10 @@ def start(args, script_dir):
         print(e)
         return ERR_CODE_NO_RESTART
 
-    db = get_db(settings)
+    db = fHDHRdb(settings)
 
     try:
-        origserv = get_originservice(settings, db)
+        origserv = originservice.OriginService(settings, db)
     except fHDHRerrors.LoginError as e:
         print(e)
         return ERR_CODE_NO_RESTART
