@@ -157,18 +157,22 @@ class ZapEPG():
                 f.write(result)
 
             self.db.set_cacheitem_value(cache_key, "offline_cache", result, "zap2it")
+            self.db.adjust_channel_list("cache_list", "offline_cache", [cache_key], "add", "zap2it")
 
             time.sleep(int(delay))
             return result
 
     def remove_stale_cache(self, zap_time):
-        cache_list = self.db.get_cacheitem_value("cache_list", "offline_cache", "zap2it") or ["1602439200", "1502755200"]
+        cache_list = self.db.get_cacheitem_value("cache_list", "offline_cache", "zap2it") or []
+        cache_to_kill = []
         for cacheitem in cache_list:
             t = int(cacheitem)
             if t < zap_time:
+                cache_to_kill.append(cacheitem)
                 self.db.delete_cacheitem_value(cacheitem, "offline_cache", "zap2it")
                 print('Removing stale cache:', str(cacheitem))
-        print(cache_list)
+        self.db.adjust_channel_list("cache_list", "offline_cache", cache_to_kill, "del", "zap2it")
+
         for p in self.web_cache_dir.glob('*'):
             try:
                 t = int(p.name)
