@@ -63,11 +63,10 @@ def run(settings, logger, db):
         if settings.dict["epg"]["method"]:
             print("EPG Update Starting")
             if settings.dict["main"]["opersystem"] in ["Windows"]:
-                # fhdhr_epg = threading.Thread(target=fhdhr.device.ssdp.run)
-                print("test")
+                fhdhr_epg = threading.Thread(target=fhdhr.device.ssdp.run)
             else:
                 fhdhr_epg = multiprocessing.Process(target=fhdhr.device.ssdp.run)
-                fhdhr_epg.start()
+            fhdhr_epg.start()
 
         # wait forever
         while True:
