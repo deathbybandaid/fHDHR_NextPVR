@@ -9,9 +9,13 @@ class Channel():
 
         if not channel_id:
             if origin_id:
+                print("a")
                 channel_id = id_system.get(origin_id)
+                print(channel_id)
             else:
+                print("b")
                 channel_id = id_system.assign()
+                print(channel_id)
         self.dict = self.fhdhr.db.get_channel_value(channel_id, "info") or self.create_empty_channel(channel_id)
         self.fhdhr.db.set_channel_value(channel_id, "info", self.dict)
 
