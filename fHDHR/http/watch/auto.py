@@ -27,7 +27,8 @@ class Auto():
             self.fhdhr.logger.error("Not Implemented %s-%s" % (str(channel_freq), str(subchannel)))
             abort(501, "Not Implemented %s-%s" % (str(channel_freq), str(subchannel)))
 
-        if channel_number not in list(self.fhdhr.device.channels.list.keys()):
+        channel_list = [self.fhdhr.device.channels.list[x].dict["number"] for x in list(self.fhdhr.device.channels.list.keys())]
+        if channel_number not in channel_list:
             response = Response("Not Found", status=404)
             response.headers["X-fHDHR-Error"] = "801 - Unknown Channel"
             self.fhdhr.logger.error(response.headers["X-fHDHR-Error"])

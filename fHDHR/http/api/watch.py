@@ -31,9 +31,11 @@ class Watch():
             if not channel_number:
                 return "Missing Channel"
 
-            if channel_number not in list(self.fhdhr.device.channels.list.keys()):
+            channel_list = [self.fhdhr.device.channels.list[x].dict["number"] for x in list(self.fhdhr.device.channels.list.keys())]
+            if channel_number not in channel_list:
                 response = Response("Not Found", status=404)
                 response.headers["X-fHDHR-Error"] = "801 - Unknown Channel"
+                self.fhdhr.logger.error(response.headers["X-fHDHR-Error"])
                 abort(response)
 
             duration = request.args.get('duration', default=0, type=int)
@@ -43,6 +45,7 @@ class Watch():
             if transcode not in valid_transcode_types:
                 response = Response("Service Unavailable", status=503)
                 response.headers["X-fHDHR-Error"] = "802 - Unknown Transcode Profile"
+                self.fhdhr.logger.error(response.headers["X-fHDHR-Error"])
                 abort(response)
 
             stream_args = {
@@ -63,6 +66,7 @@ class Watch():
                                        % (stream_args["method"], str(stream_args["channel"]), str(e)))
                 response = Response("Service Unavailable", status=503)
                 response.headers["X-fHDHR-Error"] = str(e)
+                self.fhdhr.logger.error(response.headers["X-fHDHR-Error"])
                 abort(response)
             tuner = self.fhdhr.device.tuners.tuners[int(tunernum)]
 
@@ -73,6 +77,7 @@ class Watch():
                                        % (stream_args["method"], str(stream_args["channel"]), str(e)))
                 response = Response("Service Unavailable", status=503)
                 response.headers["X-fHDHR-Error"] = str(e)
+                self.fhdhr.logger.error(response.headers["X-fHDHR-Error"])
                 tuner.close()
                 abort(response)
 
