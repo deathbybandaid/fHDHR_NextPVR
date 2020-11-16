@@ -24,11 +24,13 @@ class Auto():
             subchannel = 0
             if "-" in channel:
                 subchannel = channel.replace('ch', '').split("-")[1]
+            self.fhdhr.logger.error("Not Implemented %s-%s" % (str(channel_freq), str(subchannel)))
             abort(501, "Not Implemented %s-%s" % (str(channel_freq), str(subchannel)))
 
         if channel_number not in list(self.fhdhr.device.channels.list.keys()):
             response = Response("Not Found", status=404)
             response.headers["X-fHDHR-Error"] = "801 - Unknown Channel"
+            self.fhdhr.logger.error(response.headers["X-fHDHR-Error"])
             abort(response)
 
         method = request.args.get('method', default=self.fhdhr.config.dict["fhdhr"]["stream_type"], type=str)
@@ -39,6 +41,7 @@ class Auto():
         if transcode not in valid_transcode_types:
             response = Response("Service Unavailable", status=503)
             response.headers["X-fHDHR-Error"] = "802 - Unknown Transcode Profile"
+            self.fhdhr.logger.error(response.headers["X-fHDHR-Error"])
             abort(response)
 
         stream_args = {
@@ -56,6 +59,7 @@ class Auto():
                                    % (stream_args["method"], str(stream_args["channel"]), str(e)))
             response = Response("Service Unavailable", status=503)
             response.headers["X-fHDHR-Error"] = str(e)
+            self.fhdhr.logger.error(response.headers["X-fHDHR-Error"])
             abort(response)
         tuner = self.fhdhr.device.tuners.tuners[int(tunernum)]
 
@@ -67,6 +71,7 @@ class Auto():
             response = Response("Service Unavailable", status=503)
             response.headers["X-fHDHR-Error"] = str(e)
             tuner.close()
+            self.fhdhr.logger.error(response.headers["X-fHDHR-Error"])
             abort(response)
 
         self.fhdhr.logger.info("Tuner #" + str(tunernum) + " to be used for stream.")
