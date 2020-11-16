@@ -5,6 +5,8 @@ class Channel():
     def __init__(self, fhdhr, id_system, origin_id=None, channel_id=None):
         self.fhdhr = fhdhr
 
+        self.id_system = id_system
+
         if not channel_id:
             if origin_id:
                 channel_id = id_system.get(origin_id)
@@ -29,11 +31,11 @@ class Channel():
             channel_info["tags"] = []
 
         if "number" not in list(channel_info.keys()):
-            channel_info["number"] = self.numbers.get_number(channel_info["id"])
+            channel_info["number"] = self.id_system.get_number(channel_info["id"])
         else:
             channel_info["number"] = str(float(channel_info["number"]))
 
-        self.numbers.set_number(self.dict["fhdhr_id"], channel_info["number"])
+        self.id_system.set_number(self.dict["fhdhr_id"], channel_info["number"])
 
         self.append_channel_info(channel_info)
 

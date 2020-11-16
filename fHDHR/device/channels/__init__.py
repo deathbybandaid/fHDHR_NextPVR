@@ -97,20 +97,8 @@ class Channels():
         cleaned_channel_dict_list = []
         for station_item in channel_dict_list:
 
-            if "callsign" not in list(station_item.keys()):
-                station_item["callsign"] = station_item["name"]
-
             if "id" not in list(station_item.keys()):
                 station_item["id"] = station_item["name"]
-
-            if "tags" not in list(station_item.keys()):
-                station_item["tags"] = []
-
-            if "number" not in list(station_item.keys()):
-                station_item["number"] = self.channel_numbers.get_number(station_item["id"])
-            else:
-                station_item["number"] = str(float(station_item["number"]))
-            self.channel_numbers.set_number(station_item["id"], station_item["number"])
 
             cleaned_channel_dict_list.append(station_item)
         return cleaned_channel_dict_list
