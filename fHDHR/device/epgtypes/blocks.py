@@ -35,7 +35,7 @@ class blocksEPG():
                                                     "callsign": c["callsign"],
                                                     "name": c["name"],
                                                     "number": c["number"],
-                                                    "id": c["id"],
+                                                    "id": c["fhdhr_id"],
                                                     "thumbnail": ("/api/images?method=generate&type=channel&message=%s" % (str(c['number']))),
                                                     "listing": [],
                                                     }
@@ -56,7 +56,7 @@ class blocksEPG():
                                     "seasonnumber": None,
                                     "episodenumber": None,
                                     "isnew": False,
-                                    "id": str(c["id"]) + "_" + str(timestamp['time_start']).split(" ")[0],
+                                    "id": str(c["fhdhr_id"]) + "_" + str(timestamp['time_start']).split(" ")[0],
                                     }
 
                 programguide[str(c["number"])]["listing"].append(clean_prog_dict)

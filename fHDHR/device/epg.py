@@ -114,7 +114,7 @@ class EPG():
         channel_list = []
         for channel in list(epgdict.keys()):
             channel_list.append(epgdict[channel])
-        return next(item for item in channel_list if item["id"] == channel_id)
+        return next(item for item in channel_list if item["fhdhr_id"] == channel_id)
 
     def find_program_dict(self, event_id):
         epgdict = self.get_epg()
