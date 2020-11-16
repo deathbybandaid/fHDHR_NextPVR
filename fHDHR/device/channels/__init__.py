@@ -24,7 +24,6 @@ class Channels():
     def get_db_channels(self):
         channel_ids = self.fhdhr.db.get_fhdhr_value("channels", "IDs") or []
         for channel_id in channel_ids:
-            print(channel_id)
             channel_obj = Channel(self.fhdhr, self.id_system, channel_id=channel_id)
             channel_id = channel_obj.dict["fhdhr_id"]
             self.list[channel_id] = channel_obj
@@ -49,7 +48,6 @@ class Channels():
             channel_dict_list = self.origin.get_channels()
             channel_dict_list = self.verify_channel_info(channel_dict_list)
             for channel_info in channel_dict_list:
-                print(channel_info)
                 channel_obj = Channel(self.fhdhr, self.id_system, origin_id=channel_info["id"])
                 channel_id = channel_obj.dict["fhdhr_id"]
                 channel_obj.basics(channel_info)
