@@ -3,30 +3,8 @@ from collections import OrderedDict
 
 from fHDHR.tools import hours_between_datetime
 
-
-class ChannelNumbers():
-
-    def __init__(self, fhdhr):
-        self.fhdhr = fhdhr
-
-    def get_number(self, channel_id):
-        cnumbers = self.fhdhr.db.get_fhdhr_value("channel_numbers", "list") or {}
-        if channel_id in list(cnumbers.keys()):
-            return cnumbers[channel_id]
-
-        used_numbers = []
-        for channel_id in list(cnumbers.keys()):
-            used_numbers.append(cnumbers[channel_id])
-
-        for i in range(1, 1000):
-            if str(float(i)) not in used_numbers:
-                break
-        return str(float(i))
-
-    def set_number(self, channel_id, channel_number):
-        cnumbers = self.fhdhr.db.get_fhdhr_value("channel_numbers", "list") or {}
-        cnumbers[channel_id] = str(float(channel_number))
-        self.fhdhr.db.set_fhdhr_value("channel_numbers", "list", cnumbers)
+from .channel import Channel
+from .chan_ident import Channel_IDs
 
 
 class Channels():
@@ -36,17 +14,19 @@ class Channels():
 
         self.origin = origin
 
-        self.channel_numbers = ChannelNumbers(fhdhr)
+        self.id_system = Channel_IDs(fhdhr)
 
         self.list = {}
         self.list_update_time = None
+        self.get_db_channels()
         self.get_channels()
 
-    def get_origin_status(self):
-        try:
-            return self.origin.get_status_dict()
-        except AttributeError:
-            return {}
+    def get_db_channels(self):
+        channel_ids = self.fhdhr.db.get_fhdhr_value("channels", "IDs") or []
+        for channel_id in channel_ids:
+            channel_obj = Channel(self.fhdhr, self.id_system, channel_id)
+            channel_id = channel_obj.dict["fhdhr_id"]
+            self.list[channel_id] = channel_obj
 
     def get_channels(self, forceupdate=False):
         """Pull Channels from origin.
@@ -67,14 +47,19 @@ class Channels():
         if updatelist:
             channel_dict_list = self.origin.get_channels()
             channel_dict_list = self.verify_channel_info(channel_dict_list)
-            self.append_channel_info(channel_dict_list)
+            for channel_info in channel_dict_list:
+                channel_obj = Channel(self.fhdhr, origin_id=channel_info["id"])
+                channel_id = channel_obj.dict["fhdhr_id"]
+                channel_obj.basics(channel_info)
+                self.list[channel_id] = channel_obj
+
             if not self.list_update_time:
                 self.fhdhr.logger.info("Found " + str(len(self.list)) + " channels for " + str(self.fhdhr.config.dict["main"]["servicename"]))
             self.list_update_time = datetime.datetime.now()
 
         channel_list = []
-        for chandict in list(self.list.keys()):
-            channel_list.append(self.list[chandict])
+        for chan_obj in list(self.list.keys()):
+            channel_list.append(self.list[chan_obj].dict)
         return channel_list
 
     def get_station_list(self, base_url):
@@ -90,20 +75,10 @@ class Channels():
         return station_list
 
     def get_channel_stream(self, channel_number):
-        if channel_number not in list(self.list.keys()):
-            self.get_channels()
-        if channel_number not in list(self.list.keys()):
+        channel_id = (self.list[channel_id].dict["fhdhr_id"] for channel_id in list(self.list.keys()) if self.list[channel_id].dict["number"] == channel_number) or None
+        if not channel_id:
             return None
-        if "stream_url" not in list(self.list[channel_number].keys()):
-            chandict = self.get_channel_dict("number", channel_number)
-            streamlist, caching = self.origin.get_channel_stream(chandict, self.list)
-            if caching:
-                self.append_channel_info(streamlist)
-                return self.list[channel_number]["stream_url"]
-            else:
-                chanstreamdict = next(item for item in streamlist if item["number"] == channel_number)
-                return chanstreamdict["stream_url"]
-        return self.list[channel_number]["stream_url"]
+        return self.origin.get_channel_stream(self.list[channel_id].dict)
 
     def get_station_total(self):
         return len(list(self.list.keys()))
@@ -139,18 +114,6 @@ class Channels():
 
             cleaned_channel_dict_list.append(station_item)
         return cleaned_channel_dict_list
-
-    def append_channel_info(self, channel_dict_list):
-        """Update the list dict
-
-        Take the channel dict list given.
-        """
-        for chan in channel_dict_list:
-            if chan["number"] not in list(self.list.keys()):
-                self.list[chan["number"]] = {}
-            for chankey in list(chan.keys()):
-                self.list[chan["number"]][chankey] = chan[chankey]
-        self.channel_order()
 
     def channel_order(self):
         """Verify the Channel Order"""

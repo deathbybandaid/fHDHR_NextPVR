@@ -45,7 +45,7 @@ class Origin_HTML():
         fakefile.write("    <th></th>\n")
         fakefile.write("  </tr>\n")
 
-        origin_status_dict = self.fhdhr.device.channels.get_origin_status()
+        origin_status_dict = self.fhdhr.origin.get_status_dict()
         for key in list(origin_status_dict.keys()):
             fakefile.write("  <tr>\n")
             fakefile.write("    <td>%s</td>\n" % (str(key)))
