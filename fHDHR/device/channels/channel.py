@@ -39,8 +39,6 @@ class Channel():
         else:
             channel_info["number"] = str(float(channel_info["number"]))
 
-        self.id_system.set_number(self.dict["fhdhr_id"], channel_info["number"])
-
         self.append_channel_info(channel_info)
 
     def create_empty_channel(self, channel_id):
