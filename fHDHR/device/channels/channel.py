@@ -9,7 +9,7 @@ class Channel():
 
         if not channel_id:
             if origin_id:
-                print("a")
+                print(origin_id)
                 channel_id = id_system.get(origin_id)
                 print(channel_id)
             else:
