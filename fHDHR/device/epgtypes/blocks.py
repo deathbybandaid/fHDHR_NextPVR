@@ -45,7 +45,7 @@ class blocksEPG():
                                     "time_start": timestamp['time_start'],
                                     "time_end": timestamp['time_end'],
                                     "duration_minutes": 60,
-                                    "thumbnail": ("/api/images?method=generate&type=content&message=%s" % (str(c["fhdhr_id"]) + "_" + str(timestamp['time_start']).split(" ")[0])),
+                                    "thumbnail": ("/api/images?method=generate&type=content&message=%s" % (str(c["number"]) + "_" + str(timestamp['time_start']).split(" ")[0])),
                                     "title": "Unavailable",
                                     "sub-title": "Unavailable",
                                     "description": "Unavailable",
