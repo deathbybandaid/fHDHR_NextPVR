@@ -56,7 +56,7 @@ class M3U():
                 fakefile.write(
                                 "%s\n" % (
                                           RECORD_MARKER + ":0" + " " +
-                                          "channelID=\"" + str(channel_item['id']) + "\" " +
+                                          "channelID=\"" + str(channel_item['fhdhr_id']) + "\" " +
                                           "tvg-chno=\"" + str(channel_item['number']) + "\" " +
                                           "tvg-name=\"" + str(channel_item['name']) + "\" " +
                                           "tvg-id=\"" + str(channel_item['number']) + "\" " +
