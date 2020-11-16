@@ -23,7 +23,6 @@ class Channels():
 
     def get_db_channels(self):
         channel_ids = self.fhdhr.db.get_fhdhr_value("channels", "IDs") or []
-        print(channel_ids)
         for channel_id in channel_ids:
             print(channel_id)
             channel_obj = Channel(self.fhdhr, self.id_system, channel_id=channel_id)

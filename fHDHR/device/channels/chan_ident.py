@@ -10,9 +10,7 @@ class Channel_IDs():
         existing_channel_info = [self.fhdhr.db.get_channel_value(channel_id, "info") or {} for channel_id in existing_ids]
         for existing_channel in existing_channel_info:
             if existing_channel["origin_id"] == origin_id:
-                print("here")
                 return existing_channel["fhdhr_id"]
-        print("hereb")
         return self.assign()
 
     def assign(self):
