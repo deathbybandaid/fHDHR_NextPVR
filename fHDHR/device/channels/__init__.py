@@ -48,6 +48,7 @@ class Channels():
             channel_dict_list = self.origin.get_channels()
             channel_dict_list = self.verify_channel_info(channel_dict_list)
             for channel_info in channel_dict_list:
+                print(channel_info)
                 channel_obj = Channel(self.fhdhr, self.id_system, origin_id=channel_info["id"])
                 channel_id = channel_obj.dict["fhdhr_id"]
                 channel_obj.basics(channel_info)
