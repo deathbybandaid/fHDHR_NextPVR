@@ -3,6 +3,7 @@ import sys
 import argparse
 import time
 import multiprocessing
+import threading
 import platform
 
 from fHDHR import fHDHR_VERSION, fHDHR_OBJ
@@ -42,24 +43,29 @@ def run(settings, logger, db):
     fhdhr = fHDHR_OBJ(settings, logger, db)
     fhdhrweb = fHDHR_HTTP_Server(fhdhr)
 
-    # Ensure spawn on Windows instead of fork
-    if settings.dict["main"]["opersystem"] in ["Windows"]:
-        multiprocessing.set_start_method('spawn')
-
     try:
 
         print("HTTP Server Starting")
-        fhdhr_web = multiprocessing.Process(target=fhdhrweb.run)
+        if settings.dict["main"]["opersystem"] in ["Windows"]:
+            fhdhr_web = threading.Thread(target=fhdhrweb.run)
+        else:
+            fhdhr_web = multiprocessing.Process(target=fhdhrweb.run)
         fhdhr_web.start()
 
         if settings.dict["fhdhr"]["discovery_address"]:
             print("SSDP Server Starting")
-            fhdhr_ssdp = multiprocessing.Process(target=fhdhr.device.ssdp.run)
+            if settings.dict["main"]["opersystem"] in ["Windows"]:
+                fhdhr_ssdp = threading.Thread(target=fhdhr.device.ssdp.run)
+            else:
+                fhdhr_ssdp = multiprocessing.Process(target=fhdhr.device.ssdp.run)
             fhdhr_ssdp.start()
 
         if settings.dict["epg"]["method"]:
             print("EPG Update Starting")
-            fhdhr_epg = multiprocessing.Process(target=fhdhr.device.epg.run)
+            if settings.dict["main"]["opersystem"] in ["Windows"]:
+                fhdhr_epg = threading.Thread(target=fhdhr.device.ssdp.run)
+            else:
+                fhdhr_epg = multiprocessing.Process(target=fhdhr.device.ssdp.run)
             fhdhr_epg.start()
 
         # wait forever
