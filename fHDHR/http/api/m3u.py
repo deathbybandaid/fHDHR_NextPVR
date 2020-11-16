@@ -51,7 +51,7 @@ class M3U():
             for channel_item in channel_items:
 
                 logourl = ('%s/api/images?method=get&type=channel&id=%s' %
-                           (base_url, str(channel_item['id'])))
+                           (base_url, str(channel_item['fhdhr_id'])))
 
                 fakefile.write(
                                 "%s\n" % (

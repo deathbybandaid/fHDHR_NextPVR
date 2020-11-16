@@ -1,5 +1,6 @@
-from flask import request, redirect
+from flask import request, redirect, Response
 import urllib.parse
+import json
 
 
 class Channels():
@@ -19,6 +20,14 @@ class Channels():
 
         if method == "scan":
             self.fhdhr.device.station_scan.scan()
+
+        if method == "list":
+            channel_list = self.fhdhr.device.channels.get_channels()
+            channel_list_json = json.dumps(channel_list, indent=4)
+
+            return Response(status=200,
+                            response=channel_list_json,
+                            mimetype='application/json')
 
         else:
             return "Invalid Method"
