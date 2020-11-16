@@ -8,7 +8,6 @@ class Channel_IDs():
     def get(self, origin_id):
         existing_ids = self.fhdhr.db.get_fhdhr_value("channels", "IDs") or []
         existing_channel_info = [self.fhdhr.db.get_channel_value(channel_id, "info") or {} for channel_id in existing_ids]
-        print(existing_channel_info)
         for existing_channel in existing_channel_info:
             if existing_channel["origin_id"] == origin_id:
                 return existing_channel["fhdhr_id"]

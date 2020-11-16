@@ -18,20 +18,24 @@ class Channel():
     def basics(self, channel_info):
         """Some Channel Information is Critical"""
 
+        if "id" in list(channel_info.keys()):
+            channel_info["origin_id"] = channel_info["id"]
+            del channel_info["id"]
+
         if "name" not in list(channel_info.keys()):
             channel_info["name"] = self.dict["fhdhr_id"]
 
         if "callsign" not in list(channel_info.keys()):
             channel_info["callsign"] = channel_info["name"]
 
-        if "id" not in list(channel_info.keys()):
-            channel_info["id"] = channel_info["name"]
+        if "origin_id" not in list(channel_info.keys()):
+            channel_info["origin_id"] = channel_info["name"]
 
         if "tags" not in list(channel_info.keys()):
             channel_info["tags"] = []
 
         if "number" not in list(channel_info.keys()):
-            channel_info["number"] = self.id_system.get_number(channel_info["id"])
+            channel_info["number"] = self.id_system.get_number(channel_info["origin_id"])
         else:
             channel_info["number"] = str(float(channel_info["number"]))
 
