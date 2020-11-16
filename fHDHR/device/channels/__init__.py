@@ -75,7 +75,7 @@ class Channels():
         return station_list
 
     def get_channel_stream(self, channel_number):
-        channel_id = (self.list[channel_id].dict["fhdhr_id"] for channel_id in list(self.list.keys()) if self.list[channel_id].dict["number"] == channel_number) or None
+        channel_id = [self.list[channel_id].dict["fhdhr_id"] for channel_id in list(self.list.keys()) if self.list[channel_id].dict["number"] == channel_number] or None
         if not channel_id:
             return None
         return self.origin.get_channel_stream(self.list[channel_id].dict)
