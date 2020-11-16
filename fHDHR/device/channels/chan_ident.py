@@ -16,8 +16,8 @@ class Channel_IDs():
     def assign(self):
         existing_ids = self.fhdhr.db.get_fhdhr_value("channels", "IDs") or []
         unique_id = None
-        while not unique_id and unique_id in existing_ids:
-            unique_id = uuid.uuid4()
+        while not unique_id and str(unique_id) in existing_ids:
+            unique_id = str(uuid.uuid4())
         existing_ids.append(unique_id)
         self.fhdhr.db.set_fhdhr_value("channels", "IDs", existing_ids)
         return unique_id
