@@ -94,9 +94,8 @@ class tvtvEPG():
         return programguide
 
     def tvtv_timestamps(self, starttime, duration):
-        start_time = datetime.datetime.strptime(starttime, '%Y-%m-%d %H:%M:%S').timestamp()
-        end_time = datetime.datetime.fromtimestamp(start_time + (duration * 60))
-        start_time = datetime.datetime.fromtimestamp(start_time)
+        start_time = datetime.datetime.strptime(starttime, '%Y-%m-%d %H:%M:%S')
+        end_time = start_time + datetime.timedelta(minutes=duration)
         start_time = start_time.strftime('%Y%m%d%H%M%S +0000')
         end_time = end_time.strftime('%Y%m%d%H%M%S +0000')
         timestamp = {
