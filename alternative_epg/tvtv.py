@@ -40,7 +40,7 @@ class tvtvEPG():
         # Make a date range to pull
         todaydate = datetime.date.today()
         dates_to_pull = []
-        for x in range(0, 6):
+        for x in range(-1, 6):
             datesdict = {
                         "start": todaydate + datetime.timedelta(days=x),
                         "stop": todaydate + datetime.timedelta(days=x+1)
