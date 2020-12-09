@@ -39,15 +39,12 @@ class tvtvEPG():
 
         # Make a date range to pull
         todaydate = datetime.date.today()
-        dates_to_pull = [todaydate]
-        xdate = todaydate
-        for x in range(1, 6):
+        dates_to_pull = []
+        for x in range(0, 6):
             datesdict = {
-                        "start": xdate,
-                        "stop": xdate + datetime.timedelta(days=x)
+                        "start": todaydate + datetime.timedelta(days=x),
+                        "stop": todaydate + datetime.timedelta(days=x+1)
                         }
-            xdate = datesdict["stop"]
-            print(datesdict)
             dates_to_pull.append(datesdict)
 
         self.remove_stale_cache(todaydate)
