@@ -47,6 +47,7 @@ class tvtvEPG():
                         "stop": xdate + datetime.timedelta(days=x)
                         }
             xdate = datesdict["stop"]
+            print(datesdict)
             dates_to_pull.append(datesdict)
 
         self.remove_stale_cache(todaydate)
