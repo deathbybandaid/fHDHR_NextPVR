@@ -50,7 +50,21 @@ class tvtvEPG():
         self.remove_stale_cache(todaydate)
 
         cached_items = self.get_cached(dates_to_pull)
-        print(cached_items[0])
+        for result in cached_items:
+
+            for chan_item in result:
+                print(chan_item.keys())
+
+                """if str(cdict['channelNo']) not in list(programguide.keys()):
+
+                    programguide[str(cdict['channelNo'])] = {
+                                                        "callsign": cdict["callSign"],
+                                                        "name": cdict["name"] or cdict["callSign"],  # TODO
+                                                        "number": str(cdict["channelNo"]),
+                                                        "id": str(cdict["channelId"]),
+                                                        "thumbnail": str(cdict['thumbnail']).replace("//", "https://").split("?")[0],
+                                                        "listing": [],
+                                                        }"""
 
         return programguide
 
