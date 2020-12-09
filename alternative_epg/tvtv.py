@@ -97,8 +97,8 @@ class tvtvEPG():
         start_time = datetime.datetime.strptime(starttime, '%Y-%m-%d %H:%M:%S').timestamp()
         end_time = datetime.datetime.fromtimestamp(start_time + duration)
         start_time = datetime.datetime.fromtimestamp(start_time)
-        start_time = start_time.strftime('%Y%m%d%H%M%S %z')
-        end_time = end_time.strftime('%Y%m%d%H%M%S %z')
+        start_time = start_time.strftime('%Y%m%d%H%M%S +0000')
+        end_time = end_time.strftime('%Y%m%d%H%M%S +0000')
         timestamp = {
                     "time_start": start_time,
                     "time_end": end_time
