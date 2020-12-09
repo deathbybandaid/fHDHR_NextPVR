@@ -66,8 +66,44 @@ class tvtvEPG():
                                                         "thumbnail": "https://cdn.tvpassport.com/image/station/100x100/%s" % chan_item["channel"]["logoFilename"],
                                                         "listing": [],
                                                         }
+                for listing in chan_item["listings"]:
+
+                    timestamp = self.tvtv_timestamps(listing["listDateTime"], listing["duration"])
+
+                    clean_prog_dict = {
+                                        "time_start": timestamp['time_start'],
+                                        "time_end": timestamp['time_end'],
+                                        "duration_minutes": listing["duration"],
+                                        "thumbnail": "https://cdn.tvpassport.com/image/show/480x720/%s" % listing["artwork"]["poster"],
+                                        "title": listing["showName"],
+                                        "sub-title": listing["episodeTitle"],
+                                        "description": listing["description"],
+                                        "rating": listing["rating"],
+                                        "episodetitle": listing["episodeTitle"],
+                                        "releaseyear": listing["year"],
+                                        "genres": [],
+                                        "seasonnumber": None,
+                                        "episodenumber": None,
+                                        "isnew": listing["new"],
+                                        "id": listing["listingID"],
+                                        }
+
+                    if not any(d['id'] == clean_prog_dict['id'] for d in programguide[channel_number]["listing"]):
+                        programguide[channel_number]["listing"].append(clean_prog_dict)
 
         return programguide
+
+    def tvtv_timestamps(self, starttime, duration):
+        start_time = datetime.datetime.strptime(starttime, '%Y-%m-%d %H:%M:%S').timestamp()
+        end_time = datetime.datetime.fromtimestamp(start_time + duration)
+        start_time = datetime.datetime.fromtimestamp(start_time)
+        start_time = start_time.strftime('%Y%m%d%H%M%S %z')
+        end_time = end_time.strftime('%Y%m%d%H%M%S %z')
+        timestamp = {
+                    "time_start": start_time,
+                    "time_end": end_time
+                    }
+        return timestamp
 
     def get_cached(self, dates_to_pull):
         for datesdict in dates_to_pull:
