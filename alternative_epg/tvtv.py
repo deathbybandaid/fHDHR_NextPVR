@@ -53,18 +53,19 @@ class tvtvEPG():
         for result in cached_items:
 
             for chan_item in result:
-                print(chan_item.keys())
 
-                """if str(cdict['channelNo']) not in list(programguide.keys()):
+                channel_number = "%s.%s" % (chan_item["channel"]['channelNumber'], chan_item["channel"]['subChannelNumber'])
 
-                    programguide[str(cdict['channelNo'])] = {
-                                                        "callsign": cdict["callSign"],
-                                                        "name": cdict["name"] or cdict["callSign"],  # TODO
-                                                        "number": str(cdict["channelNo"]),
-                                                        "id": str(cdict["channelId"]),
-                                                        "thumbnail": str(cdict['thumbnail']).replace("//", "https://").split("?")[0],
+                if str(channel_number) not in list(programguide.keys()):
+
+                    programguide[channel_number] = {
+                                                        "callsign": chan_item["channel"]["callsign"],
+                                                        "name": chan_item["channel"]["name"],
+                                                        "number": channel_number,
+                                                        "id": str(chan_item["channel"]["stationID"]),
+                                                        "thumbnail": "https://cdn.tvpassport.com/image/station/100x100/%s" % chan_item["channel"]["logoFilename"],
                                                         "listing": [],
-                                                        }"""
+                                                        }
 
         return programguide
 
