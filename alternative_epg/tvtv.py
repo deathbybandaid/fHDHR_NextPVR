@@ -28,7 +28,7 @@ class tvtvEPG():
     def lineup_id(self):
         lineup_id_url = "https://www.tvtv.us/tvm/t/tv/v4/lineups?postalCode=%s" % self.postalcode
         if self.fhdhr.config.dict["tvtv"]["lineuptype"]:
-            lineup_id_url += "&lineuptype=%s"
+            lineup_id_url += "&lineuptype=%s" % self.fhdhr.config.dict["tvtv"]["lineuptype"]
         lineup_id_req = self.fhdhr.web.session.get(lineup_id_url)
         data = lineup_id_req.json()
         lineup_id = data[0]["lineupID"]
