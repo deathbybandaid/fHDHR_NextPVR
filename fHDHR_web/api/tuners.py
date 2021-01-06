@@ -98,10 +98,7 @@ class Tuners():
             tuner.set_status(stream_args)
             session["tuner_used"] = tunernum
 
-            if stream_args["method"] == "direct":
-                return Response(tuner.get_stream(stream_args, tuner), content_type=stream_args["content_type"], direct_passthrough=True)
-            elif stream_args["method"] in ["ffmpeg", "vlc"]:
-                return Response(stream_with_context(tuner.get_stream(stream_args, tuner)), mimetype=stream_args["content_type"])
+            return Response(stream_with_context(tuner.get_stream(stream_args, tuner)), mimetype=stream_args["content_type"])
 
         elif method == "close":
 
